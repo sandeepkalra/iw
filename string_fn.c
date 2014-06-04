@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int StrLen( char *p)
 {
@@ -42,6 +43,25 @@ char *StrChr(char *hay, char c)
 	return hay;
 }
 
-int main() 
+char *StrDup(char *s, int sz)
 {
+	char *p = (char*) malloc(sz+1);
+	if(!p) return 0;
+	StrCpy(p,s);
+	p[sz]='\0';
+	return p;
+}
+char *StrCat(char *Dest, char *Src) /*Dest big-enough to hold additional Src char */
+{
+	char *p = Dest; 
+	int sz_d = StrLen(Dest);
+	int sz_s = StrLen(Src);
+	int i=0;
+	for(i=0 ; i < sz_s ; ++i) Dest[i + sz_d ] =  Src[i];
+	Dest[sz_d + sz_s] = '\0';
+	return p;
+}
+
+int main() 
+{	
 }
