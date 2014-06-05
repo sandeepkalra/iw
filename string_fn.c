@@ -75,6 +75,7 @@ char *StrReverse(char *Src)
 	return Src;
 }
 
+// O(n)
 char *StrNReverse(char *Src, int n)
 {
 	int sz = StrLen(Src);
@@ -87,6 +88,17 @@ char *StrNReverse(char *Src, int n)
 	}
 	return Src;
 }
+// O(Log(n)) 
+char *StrNReverseRecursive(char *src, int n)
+{
+	//Base Condtion:
+	char t = src[0]; src[0] = src[n-1]; src[n-1] = t;
+	//Recurse :
+	if(n>2) StrNReverseRecursive(src+1, n-2);
+	return src;
+}
+
+
 
 char *StrWordReverse(char *src)
 {
@@ -98,7 +110,7 @@ char *StrWordReverse(char *src)
 	while(p && *p!='\0') {
 		char *word_end= StrChr(p,c);
 		int sz_word = word_end - p;
-		p = StrNReverse(p,sz_word);
+		p = StrNReverse(p,sz_word); // words are usually less than 32 character. so, O(n) and O(log n) are almost same.
 		p = p + sz_word + 1 ;
 	}
 	return reverse;
@@ -107,7 +119,9 @@ char *StrWordReverse(char *src)
 int main() 
 {	
 	char arr[] = "This is a string that need some reversal";
-	char arr1[] = "1234 5678 9101112" ;
-	printf("%s \n" , StrWordReverse(arr));
-	printf("%s \n" , StrWordReverse(arr1));
+	printf("%s \n" , StrNReverseRecursive(arr,StrLen(arr)));
+	printf("%s \n" , StrReverse(arr));
+// Asymtotic  analysis: For some n, line will be better. 
+// the first reversal took 0.04 ms whereas the second was 0.03 ms (Linear). 
+// but with growing n, the log(n) will get smaller.
 }
