@@ -75,6 +75,8 @@ int* find_k_largest_numbers(int *array, int sz, int k)
         left[pivot]=t;
     }
 
+	free(array); // this assumes that the array was on heap!
+
     if(sz_right==k) /* Right list is what we want */{ free(left); return return_ptr;}
     if(sz_right >k) /*Right has it. infact it has more. */ {free(left); return find_k_largest_numbers(right, sz_right , k);}
     if(sz_right <k) /* Right has few; left has few. Keep the right, pull remaining from left. */
@@ -87,22 +89,38 @@ int* find_k_largest_numbers(int *array, int sz, int k)
 				{ 
 					right[sz_right + i] = p[i]; 
 				}
-			free(left);
-            free(p);
+            free(p); //left will get free in side the recursive call.
 		} 
-
         return return_ptr;
 	}	
 }
 
+// OFn)
+int *find_k_largest_numbers_from_super_big_list(int *array, int sz, int k)
+{
+	int *p  = (int*) malloc(sz/sizeof(int));
+	
+	// since the k numbers are too small compared to sz, so , we run a sequencial 
+	// search , and for each number, we place it in the internal_array if they are 
+	// larger than the largest of this array. we use shift to shift the things so 
+	// we do not overflow the internal array!
+	// the internal array can be linklist.... but then order grows to O(nxk)
+
+	return p;
+
+}
+
+
 int main()
 {
 	int i=0;
-    signed int array[]={0,-1,1};
+    int *array = malloc(6* sizeof(int));
+	array[0]=3; array[1]=4; array[2]=9; array[3]=123; array[4]=101;array[5]=0;
+
 	printf("Largest: %d\n", find_largest(array, sizeof(array)/sizeof(signed int)));
 	printf("Smallest: %d\n", find_smallest(array, sizeof(array)/sizeof(signed int)));
 	 
-	int * p = find_k_largest_numbers(array, sizeof(array)/sizeof(int), 3);
+	int * p = find_k_largest_numbers(array, 6, 3);
     if(p) for(i=0;i<3;++i) printf("  %d \n",p[i]);
     if(p) free(p);
 } 
