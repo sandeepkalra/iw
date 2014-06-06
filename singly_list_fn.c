@@ -83,15 +83,26 @@ void Insert_front(int n)
 
 struct node* reverse()
 {
-	struct node *new_list_head = 0;
+	struct node *head = 0 ;
+	struct node *prev = 0 ;
 
 	while(start) {
-		struct node *p = new_list_head;
-		new_list_head  = start;
-		new_list_head->next = p;
+		head = start;
 		start = start->next;
+		head->next = prev;
+		prev = head;
 	}
-	return new_list_head;
+	return head;
+}
+void reverse_using_recurrsion(struct node *p)
+{
+	struct node *head = p;
+	struct node *next = p->next;
+	if(!p) return ;
+	if(!p->next) {start=p; return;/*remember to return from here */}
+	reverse_using_recurrsion (next);
+	head->next->next = head;//tricky step!
+	head->next = 0;//tricky-step
 }
 
 void print_all()
@@ -106,8 +117,15 @@ int main()
 	Insert_end(100);
 	Insert_front(4);
 	Insert_end(400);
-	Del(10);
-	Del(4);
+	printf("Has Loop = %s\n", (PASS==has_loop())?"Yes":"No");
 	print_all();
+	start = reverse();
+	printf("After Reversal:\n");
+	print_all();
+	reverse_using_recurrsion(start);
+	printf("After Reversal:\n");
+	print_all();
+
 	destroy_all();
+
 }
