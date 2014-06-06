@@ -25,7 +25,7 @@ int Insert_end(int v)
 	while(p->next) p = p->next;
 	p->next = malloc(sizeof(struct node));
 	if(!p->next) return FAIL;
-	p->next->next = 0; p->next->data = 0;
+	p->next->next = 0; p->next->data = v;
 	return PASS;
 }
 
@@ -40,7 +40,7 @@ int Del(int v)
 	while(p->next) {
 		if(p->next->data == v) break; else p = p->next;
 	}
-	if(p && p->next == v){
+	if(p && p->next->data == v){
 		struct node*next= p->next->next;
 		free(p->next);
 		p->next = next;
@@ -83,7 +83,7 @@ void Insert_front(int n)
 
 struct node* reverse()
 {
-	stuct node *new_list_head = 0;
+	struct node *new_list_head = 0;
 
 	while(start) {
 		struct node *p = new_list_head;
@@ -92,4 +92,22 @@ struct node* reverse()
 		start = start->next;
 	}
 	return new_list_head;
+}
+
+void print_all()
+{
+	struct node *p = start;
+	while(p) { printf("%d \n",p->data); p=p->next; }
+}
+
+int main()
+{
+	Insert_front(10);
+	Insert_end(100);
+	Insert_front(4);
+	Insert_end(400);
+	Del(10);
+	Del(4);
+	print_all();
+	destroy_all();
 }
