@@ -91,8 +91,15 @@ void Printall(char *msg)
 			p = p->next; 
 	}
 }
-void ReverseRecurrsion()
+void ReverseRecurrsion(struct node *s)
 {
+	if(!s) return;
+	if(s->next==0) start=s;//node down s, if its last node.
+	ReverseRecurrsion(s->next);
+	//swap s->next,s->prev.
+	struct node *t = s->next;
+	s->next = s->prev;
+	s->prev =t ;
 }		
 
 int main ()
@@ -102,7 +109,7 @@ int main ()
 	Insert(10);
 	Insert(12);
 	Printall("before reverse");
-	Reverse();
+	ReverseRecurrsion(start);
 	Printall("after reverse");
 }
 
