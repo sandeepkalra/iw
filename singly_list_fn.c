@@ -65,6 +65,8 @@ int find(int n)
 	if(!p) return FAIL; else return PASS;
 }
 
+
+// METHOD-(FLOYD LOOP DETECTION 
 int has_loop()
 {
 	struct node *p = start;
@@ -104,6 +106,34 @@ void reverse_using_recurrsion(struct node *p)
 	head->next->next = head;//tricky step!
 	head->next = 0;//tricky-step
 }
+
+void break_loop()
+{
+	int k=0;
+	if(FAIL==has_loop()) return; /* no point doign the function. */
+	struct node *p = start;
+	struct node *pp = p;
+	while(p && pp) { p= p->next; k++; if(p) pp=p->next; if(pp==p) break; }//same code as has loop, but we break!
+	// METHOD-1 (INEFFICIENT)
+	// we can start fresh. and put all numbers in hash, or mark visited untill we visit again. then we know the end node and we can remove the link.
+
+	// METHOD-2 (FLOYD LOOP DETECTION AND REMOVAL 
+	// put counter with slow pointer, and at point of loop, let that value be k.
+	// now restart, with 2 pointers, 
+	// p at speed 1 at location 0, 
+	// p pat speed 1 at location k..
+	// the point they meet again is the node. (so, keep another pointer for prev node).
+	p = start->next; // p is at 1st node
+ 
+	pp=start; for(int i=0;i<k;i++) pp=pp->next; // pp is now at kth node
+	pp = pp->next; // pp is at k+1 node.
+
+	struct node *old=start;
+	while(p!=pp) { old = pp; p = p->next; pp=p->next; }  
+	
+	if(pp=p) old->next = 0; //link removed.
+}
+
 
 void print_all()
 {
