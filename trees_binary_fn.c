@@ -189,6 +189,45 @@ void DestroyTree(struct node *p)
 	}
 }
 
+
+struct node * FindCommonAncestorByValue(struct node *r,int a, int b)
+{
+	struct node *p  = r;
+	if(p->data == a || p->data == b) return 0;
+	if(p->data > a && p->data > b) return FindCommonAncestorByValue(p->left,a,b);
+	else if(p->data < a && p->data <b) return FindCommonAncestorByValue(p->right,a,b);
+	else if((a<b && p->data >a && p->data <b ) || (b>a && p->data >b && p->data <a))
+	{
+		return p;
+	}
+return 0;
+}
+
+struct node * FindCommonAncestorByPointer(struct node*a , struct node*b)
+{
+// do in-order traversal. record nodes after a or b is hit, keep recording till the other is found.
+// if there is 0 element recorded, there is no common ansestor. one is parent of other.
+// if there is 1 element recorded, then that is the common ancestor.
+// if more than 1 is recorded.
+	// then do - pre-order. (root, left, right). record till first of a or b is found. stop.
+    // do the recording comparision with in-order. if 1 common, that's it, if more than 1 then
+       // then do -post-order(left,right,root). record after a and b are both found. 
+       // do another diff betwen all 3 list. just one of the answer will appear.
+// O(nlogn)x3...worst case!
+return 0;
+}
+
+struct node *BFS(struct node *r, int v)
+{
+	// create Queue, and then
+    // for each element starting with r, push r, 
+   // then pop top, say r. if r==v return else if r->left, r->right. push them.
+   // again pop , value compare, if not, and r->left and r->right, push again.
+  // till end of Q.
+return 0;
+}
+   
+
 int main ()
 {
 	Insert(10);
