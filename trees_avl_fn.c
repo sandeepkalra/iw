@@ -78,12 +78,18 @@ struct node * LeftRotate(struct node *p)
 	return right;
 
 }
-struct node * DoubleLeftRotate(struct node *p)
+struct node * LRRotate(struct node *p)
 {
+	struct node *temp = RightRotate(p->left);
+	p->left = temp;
+	return LeftRotate(p);
 }
 
 struct node * DoubleRightRotate(struct node *p)
 {
+	struct node *temp = LeftRotate(p->right);
+	p->right = temp;
+	return RightRotate(p);
 }
 
 
