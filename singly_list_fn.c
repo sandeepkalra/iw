@@ -106,6 +106,15 @@ void reverse_using_recurrsion(struct node *p)
 	head->next->next = head;//tricky step!
 	head->next = 0;//tricky-step
 }
+void Insert_after(struct node *p, int k)
+{
+	if(!p) return;
+	struct node * temp = (struct node*) malloc(sizeof(struct node));
+	if(!temp) return;
+	temp->data = k;
+	temp->next = p->next;
+	p->next= temp;
+}
 
 void break_loop()
 {
@@ -125,7 +134,8 @@ void break_loop()
 	// the point they meet again is the node. (so, keep another pointer for prev node).
 	p = start->next; // p is at 1st node
  
-	pp=start; for(int i=0;i<k;i++) pp=pp->next; // pp is now at kth node
+	pp=start; 
+	for(int i=0;i<k;i++) pp=pp->next; // pp is now at kth node
 	pp = pp->next; // pp is at k+1 node.
 
 	struct node *old=start;
@@ -144,6 +154,7 @@ void print_all()
 int main()
 {
 	Insert_front(10);
+	Insert_after(start,1);
 	Insert_end(100);
 	Insert_front(4);
 	Insert_end(400);

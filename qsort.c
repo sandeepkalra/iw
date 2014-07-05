@@ -30,14 +30,14 @@ void qsort(int *a, int l, int r)
 {
 	int pivot_pos = 0;
 	if(r>l) {
-			int pivot_pos = Partition(a,l,r);
+			pivot_pos = Partition(a,l,r);
 			qsort(a, l, pivot_pos - 1);
 			qsort(a, pivot_pos + 1, r);
 	}
 }
 
 
-int arr[]={10,9,328,1734,77,18,96};
+int arr[]={1,2,3,4,5,6,7,8,9} ;
 int main()
 {
 	int i = 0;

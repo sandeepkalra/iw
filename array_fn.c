@@ -95,6 +95,16 @@ int* find_k_largest_numbers(int *array, int sz, int k)
 	}	
 }
 
+
+void Reverse_array(int *array, int sz)
+{
+	int t=array[0];
+	array[0] = array[sz-1];
+	array[sz-1] = t;
+	if(sz>2) { Reverse_array(array+1, sz-2); }
+}
+
+
 // OFn)
 int *find_k_largest_numbers_from_super_big_list(int *array, int sz, int k)
 {
@@ -107,6 +117,28 @@ int *find_k_largest_numbers_from_super_big_list(int *array, int sz, int k)
 	// the internal array can be linklist.... but then order grows to O(nxk)
 
 	return p;
+
+}
+
+void MergeSort(int *array, int sz)
+{
+
+	int split = sz/2;
+	if(sz > 2)
+	{
+		MergeSort(array,split);
+		MergeSort(array+split, sz-split);
+		Merge(array, split, array+split, sz-split);
+	} else {
+	
+		if(sz==2 && array[0] > array[1]) 
+		{
+				int t=array[0];
+				array[0]=array[1];
+				array[1] = t;
+		}
+
+	}
 
 }
 
