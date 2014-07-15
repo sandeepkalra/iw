@@ -45,7 +45,7 @@ public:
 		for (int i = 0; i < (sz_t - sz_p + 1); i+=skip)
 		{
 			skip = 0;
-			for (j = sz_p-1; j != 0; --j)
+			for (j = sz_p-1; j >= 0; --j)
 			{
 				if (text[i + j] != needle[j])
 				{
@@ -54,7 +54,7 @@ public:
 					break;
 				}
 			}
-			if (j == 0) return &text[i];
+			if (j < 0) return &text[i];
 		}
 		return 0;
 	}

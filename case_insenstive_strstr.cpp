@@ -32,7 +32,7 @@ char *strIstr(char *text, char *needle)
 	for (i = 0; i < (sz_t - sz_p + 1); i+=skip)
 	{
 		skip = 0;
-		for (j = sz_p-1; j != 0; --j)
+		for (j = sz_p-1; j >= 0; --j)
 		{
 			if (tolower(text[i + j]) != tolower(needle[j]))
 			{
@@ -41,7 +41,7 @@ char *strIstr(char *text, char *needle)
 				break;
 			}
 		}
-		if (j == 0) return &text[i];
+		if (j < 0) return &text[i];
 	}
 	return 0;
 }
@@ -49,7 +49,7 @@ char *strIstr(char *text, char *needle)
 int main()
 {
 	char *p = "Needle";
-	char *t = "finding the nEeDle in hay using Boyce Moore's Algorithm!";
+	char *t = "Finding Needle in hay";
 	char * answer  = strIstr(t, p);
 	if(answer) printf("%s\n", answer);
 	else printf(" String not found \n");
