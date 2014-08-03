@@ -3,8 +3,10 @@
 #include <map>
 #include <algorithm>
 #include <list>
+#include <vector>
 #include <deque>
 #include <stack>
+#include <set>
 using namespace std;
 
 
@@ -78,6 +80,7 @@ public:
 		}
 	}//has_triangle	
   }
+ 
  
   ///////////////////////////////////////////////////
   //////////////////     B F S  /////////////////////
@@ -153,13 +156,34 @@ public:
 	
  }//DFS
 
+ vector<int>  SecondDegree(int u) {
+	vector<int> v;
+ 	for(auto i: ajList[u])
+		for(auto j: ajList[i])
+			if(j!=u) // u is also mutual friend.
+				v.push_back(j);
+	return v;
+ }
+ vector<int> ThirdDegree(int u) {
+	vector<int> v2 = SecondDegree(u);
+	vector<int> v3;
+	for(auto i: v2)
+		for(auto j: ajList[i])
+			if(j != u) v3.push_back(j);
+	// Note: V3 may have duplicates.
+	// The suggested technique is to put in SET, and BACK!
+	set<int> s( v3.begin(), v3.end() );
+	v3.assign( s.begin(), s.end() );
+	return v3;
+} // Most of the People in this world are less than 7 degree apart.
+
  /////////////////////////////////////////////////////////
  //////////////// Dijkstra's  ////////////////////////////
  /////////////////////////////////////////////////////////
  void Dijktra_SingleSourceShortestPath(int u, int v)
  { 
 	
-	/*  Dijkstra's : map, and many utilities uses it.
+     /*  Dijkstra's : map, and many utilities uses it.
      *
      *  1. Assign 0 cost to u, and all others Infinity! (in HEAP). 
      *  2. Mark u-visited.
