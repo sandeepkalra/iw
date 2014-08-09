@@ -8,8 +8,9 @@ class cAVL {
 		node*left;
 		node*right;
 		node*parent;
+		int height;
 		int data;
-		node(int d):data(d),left(0),right(0),parent(0){}
+		node(int d):height(0), data(d),left(0),right(0),parent(0){}
 	};
 	node *root;
 	int ComputeHeight(node *p)
@@ -124,6 +125,41 @@ public:
 		PrintInOrder(root);
 	}
 	
+	/* In this variation of Insert, the bool returns true if height has increased by 1.*/
+	bool Insert(node *p , int v) {
+		if(!p) return false;
+		if(p && p->data > v && p->left) 
+		{ // to left.
+			bool b =  Insert( p->left, v);
+			if (b) p->height++;
+			return b;
+		}
+		else if( p && p->data < v && p->right)
+		{ // to right
+			bool b =  Insert(p->right, v);
+			if (b) p->height++;
+			return b;
+		} else if (p && p->data > v)
+		{
+			p->left = new node(v);
+			if(p->right) /*sibling exist */	 return false;
+			else 
+				{
+					p->height ++;
+					return true; 
+				}
+		} else if (p && p->data < v)
+		{
+			p->right = new node(v);
+			if(p->left) /* sibling exist */ return false;
+			else 
+				{
+					p->height ++;
+					return true; 
+				}
+		}
+	}
+
 	void Insert(int v){
 		node *temp = new node(v);
 		node *p=root;
