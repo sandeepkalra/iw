@@ -7,7 +7,13 @@ struct node {
 	char c;
 	bool isEnd; 
 	node *next[256];
-	node(char ch) : c(ch) { memset(this->next, 0 , sizeof(node*)*256); if(c=='$') isEnd = true; }
+	node(char ch) : c(ch) 
+	{ 
+		memset(this->next, 0 , sizeof(node*)*256); 
+		if(c=='$') 
+			isEnd = true; 
+		else isEnd=false;
+	}
 };
 
 static node start('%');
@@ -16,30 +22,41 @@ void Insert(const char *c)
 {
 	if(!c) return;
 	char *s=const_cast<char*>(c);
-	node *curr = (&start)->next[tolower(*s)];
-	while(*s != '\0') 
+	node *curr = &start;
+	
+	while(*s != '\0' && curr) 
 	{
-		if(curr == nullptr) 
-		{ 
-			curr = new node(*s); 
+		node *next = curr->next[tolower(*s)];
+		if(next == nullptr) 
+		{ 			
+			curr->next[tolower(*s)] = new node(*s); 
 		}
-		++s; 
-		curr = curr->next[tolower(*s)];
+		curr = curr->next[tolower(*s)];		
+		++s; 		
 	}
-	curr = new node('$');
+	curr->next['$'] = new node('$');
 }
 
 bool Find(const char *c)
 {
 	char *s=const_cast<char*>(c);
-	node *p = start.next[tolower(*s)];
-	while(*s!='\0' && p) { p = p->next[tolower(*s)]; ++s; }
-	if(*s=='\0' && p && p->isEnd) return true; else return false;
+	node *curr = &start;
+
+	while(*s!='\0' && curr) 
+	{ 
+		curr = curr->next[tolower(*s)];
+		s++;
+	}
+	if(*s=='\0' && curr && curr->next[tolower('$')]->isEnd) 
+		return true; 
+	else 
+		return false;
 }
 
 int main()
 {
-	string names[]={"sk","sandeep","gurgaon"};
-	for(auto i: names) Insert(i.c_str());
-	cout<<"Find(SANDEEP)="<<Find(string("SANDEEP").c_str())<<endl;
+	string names[]={"india","delhi","gurgaon"};
+	for(int i=0; i<3;++i) Insert(names[i].c_str());
+	cout<<"Find(Delhi)="<<Find(string("Delhi").c_str())<<endl;
+	cout<<"Find(USA)="<<Find(string("USA").c_str())<<endl;
 }
