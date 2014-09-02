@@ -29,7 +29,6 @@ int main ()
 			else if(sum > arr[i]) {  start_pos = prev = i ; sum = arr[i];  }
 		} 
 		else /*Not subsequent */ 	if(sum > arr[i]) { start_pos = prev = i ; sum = arr[i];  }
-
 	}
 	cout<<"smallest sum is : " << sum <<" Starting @ position "<<start_pos<<endl;;
 }
