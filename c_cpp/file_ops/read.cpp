@@ -22,9 +22,11 @@ int main () {
 	in_stream.seekg(0,in_stream.beg); // move back cursor once length is measured.
 	cout<<"file length:"<<length<<endl;
 	char *buffer = new char[length];
-	
 	in_stream.read(buffer, length);
 
+	cout<<buffer<<endl;
+	cout<<"file size was "<< length<<" bytes"<<endl;
+	
 	delete buffer;
 }
 

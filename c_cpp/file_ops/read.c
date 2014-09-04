@@ -20,7 +20,10 @@ int main()
 		if(bytes_read <= 0 ) cond = 0;
 	}
 	buffer[index_in_buffer]='\0';
-
+	
+	char *p = buffer;
+	for(int i=0;i<index_in_buffer;++i) printf("%c",*p++);
+	
 	printf("File Reading complete. Total bytes = %d", index_in_buffer);
 
 	fclose(fp);
