@@ -12,7 +12,7 @@ int main () {
 	fstream in_stream;
 	in_stream.open(filename, fstream::in | fstream::app);
 
-	if(!in_stream)
+	if(!in_stream.is_open())
 	{
 		cout<<"Cannot find file "<<filename<<". Ending... "<<endl;
 		return 0;
