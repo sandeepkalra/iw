@@ -26,9 +26,9 @@
  -------------------------*/
 
 
-#define Set_K_th_Bit(n,k) 	(n | (0x01 << k) )
-#define UnSet_K_th_Bit(n,k) 	(n & (0x01 << k) )
-#define flip_k_th_Bit(n,k)      (n ^ (0x01 << k) )
+#define Set_K_th_Bit(n,k) 	(n | (0x01 << (k)) )
+#define UnSet_K_th_Bit(n,k) 	(n & (0x01 << (k)) )
+#define flip_k_th_Bit(n,k)      (n ^ (0x01 << (k)) )
 #define is_kth_bit_Set(n,k)     ((n>>(k-1)) && 1 )
 
 
@@ -46,6 +46,21 @@ void PrintNumberInBinary(int n)
 	for (i=0; i<32; ++i) printf("%c", arr[i]);
 }
 
+void ReverseBits(int n, int sz)
+{
+	int mid = sz/2;
+	int i = 0;
+	for( ;i < mid ; ++i )
+	{
+		// if the i-th and (sz-i)-th bits are different
+		int bit_i = (n & (0x01<<i))?1:0;
+		int bit_sz_minus_i = (n & (0x01<<(sz-i)))?1:0;
+		if(bit_i ^ bit_sz_minus_i) {
+			flip_k_th_Bit(n, i);
+			flip_k_th_Bit(n, sz-i);
+		}
+	}
+}
 int main()
 {
 }
