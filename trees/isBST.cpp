@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+using namespace std;
 
 struct node {
 	node*left;
@@ -6,22 +8,52 @@ struct node {
 	int data;
 };
 
-bool isBST(node *p)
+
+node *successor(node *p) { /* leftmost in right node */
+	node * ret = 0;
+	if(p->right) {
+		ret  = p->right;
+		while(ret->left) ret = ret->left;
+	}
+	return ret;
+}
+
+node *predecessor (node *p) { /* rightmost in left node */
+	node * ret  = 0;
+	if(p->left) {
+		ret = p->left;
+		while(ret->right) ret = ret->right;
+	}
+	return ret;
+}
+
+/* Problem statment: 
+	if there is a duplicate, then putting things in vector will not help!
+	else , we must check pred and succ also , to see strict increasing order!
+*/
+bool isBST ( node *p )
 {
 	if(!p) return false;
+	if ((p->left && p->left->data <= p->data ) && (p->right && p->right->data > p->data))
+	{	/* node level is checked first */
 
-	// check p first.
-	if((p->left && p->left->data > p->data) ||
-		(p->right && p->right->data < p->data)) return false;
+		node *succ = successor(p);
+		node *pred = predecessor(p);
 
-	// check p->left.
-	if(p->left && !isBST(p->left)) return false;
-
-	// check p->right.
-	if(p->right && !isBST(p->right)) return false;
-
-	return true;
+		if(succ &&  p->data <= succ->data) return false; 
+		if(pred &&  p->data > pred->data) return false;
+			
+		if(p->left) {
+			if(!isBST(p->left)) return false;
+		}
+		if(p->right) {
+			if(!isBST(p->right)) return false;
+		}
+		return true;
+	}
+	return false;
 }
+
 
 int counter=0;
 int n=10;
