@@ -54,6 +54,29 @@ bool isBST ( node *p )
 	return false;
 }
 
+void FillInorder(node *p, vector<int> &v) 
+{
+	if(p) {
+		if(p->left) FillInorder(p->left, v);
+		v.push_back(p->data);
+		if(p->right) FillInorder(p->right, v);
+	}
+}
+bool isBST_NoDuplicates(node *p)
+{
+	if(!p) return 0;
+	vector<int> v;
+	FillInorder(p,v);
+	
+	int sz = v.size;
+	int vPrev = v[0];
+
+	for(auto i = 1; i < sz; i++) {
+		if(vPrev >= v[i]) return false;
+		vPrev = v[i];
+	}
+	return true;
+}
 
 int counter=0;
 int n=10;
