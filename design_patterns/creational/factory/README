@@ -1,0 +1,3 @@
+Create a Interface Class.
+Create all Classes that are using this Inteface Class.
+Create a Factory that can host all the classes using Interface Class.
