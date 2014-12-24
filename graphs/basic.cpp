@@ -56,8 +56,10 @@ public:
   void AddEdge(int u, int v, int cost=1)
   {
 	// VECTOR objects are not exactly ARRAY. So, Insert is not very simple.
-	VertexPool[u] = new node(v);
-	VertexPool[v] = new node(u);
+	if(VertexPool[u] == nullptr)
+			VertexPool[u] = new node(v);
+	if(VertexPool[v] == nullptr)
+			VertexPool[v] = new node(u);
 	
 	ajList[u].push_back(v); 
 	ajList[v].push_back(u);
