@@ -1,3 +1,7 @@
+/* Author : Sandeep Kalra */
+/* vim set ts=4 
+ * g++  -std=c++1y -g -pthread $1.cpp
+ */
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -17,7 +21,7 @@ enum eSystem
 	eMaxMsgDataSz = 200
 };
 
-class cMsg 
+struct sMsg 
 {
 		int mCode;
 		int mSubCode;
@@ -25,12 +29,11 @@ class cMsg
 		int mLengthOfData;
 		char mData[eSystem::eMaxMsgDataSz];
 		bool mFree = true;
-	public:
-		cMsg() : mCode(0), mSubCode(0), mParamType(0) , mLengthOfData(0)
+		sMsg() : mCode(0), mSubCode(0), mParamType(0) , mLengthOfData(0)
 		{
 			 memset(mData,0,eSystem::eMaxMsgDataSz); 
 		}
-		~cMsg() {}
+		~sMsg() {}
 		void Reset() 
 		{ 
 			memset(mData,0,eSystem::eMaxMsgDataSz); 
@@ -46,7 +49,7 @@ class cMsg
 				memset(mData, 0, mLengthOfData);
 			}
 		}
-		cMsg& operator=(const cMsg& rhs)
+		sMsg& operator=(const sMsg& rhs)
 		{/* with pointer, take care and do *p_new = *p_old for this operator */
 			mCode = rhs.mCode;
 			mSubCode = rhs.mSubCode;
@@ -58,7 +61,7 @@ class cMsg
 			}
 			return *this;
 		}
-		bool operator==(const cMsg& rhs)
+		bool operator==(const sMsg& rhs)
 		{
 			return (
 					mCode == rhs.mCode &&
@@ -71,14 +74,14 @@ class cMsg
 
 class cPool {
 	int mSz;
-	cMsg ** mPool;
+	sMsg ** mPool;
 	public:
 		cPool(int vSz) : mSz(vSz) , mPool(0) 
 		{
-			mPool = new cMsg*[vSz];
+			mPool = new sMsg*[vSz];
 			for(int i = 0; i< vSz; ++i) 
 			{
-				mPool[i] = new cMsg();
+				mPool[i] = new sMsg();
 			}
 		}
 		~cPool() 
@@ -89,9 +92,9 @@ class cPool {
 			}
 			delete[] mPool;
 		}
-		cMsg *Malloc() 
+		sMsg *Malloc() 
 		{
-			cMsg *p = 0; 
+			sMsg *p = 0; 
 			for (int i =0; i < mSz; ++i) 
 			{
 				if(mPool[i]->IsFree()) 
@@ -103,7 +106,7 @@ class cPool {
 			}
 			return p;
 		}
-		void Free(cMsg * vArg) 
+		void Free(sMsg * vArg) 
 		{
 			vArg->SetFree(true);
 		}
@@ -111,23 +114,26 @@ class cPool {
 
 class cQueue 
 {
-	cMsg **mMsgHolder;
+	sMsg **mMsgHolder;
 	pthread_cond_t mCondHandle; /* cond = newmsg */
 	pthread_condattr_t mCondAttrHandle;
 	pthread_mutex_t mMutex;
 	int mSz;
 	int mReadHead;
 	int mWriteHead;
-	int mCurrentSize;
+	int mFilledCnt;
 	bool flag = false;
 public:
-	cQueue()
+	cQueue(int vSz=20)
 	{
 		mMsgHolder = 0;
 		mReadHead = 0;
 		mWriteHead = 0;
+		mFilledCnt = 0;
+		mSz = vSz;
 		pthread_condattr_init(&mCondAttrHandle);
 		pthread_cond_init(&mCondHandle, &mCondAttrHandle);
+		mMsgHolder = new sMsg*[vSz];
 	}
 	~cQueue()
 	{
@@ -135,44 +141,40 @@ public:
 		pthread_condattr_destroy(&mCondAttrHandle);
 		if(mSz) delete [] mMsgHolder;
 	}
-	void Init(int vSz) 
+	sMsg* deQueue(bool block=true)
 	{
-		mCurrentSize = mSz = vSz;
-		mMsgHolder = new cMsg*[vSz];
-	}
-	int GetCurrentSize()
-	{
-		return mCurrentSize ;
-	}
-	cMsg* deQueue(bool block=true)
-	{
-		cMsg *p = 0;
+		sMsg *p = 0;
 		pthread_mutex_lock(&mMutex);
-		if(block) {
+
+		/* if blocking is true, then block if-and-only-if
+		 * there is no data filled 
+	 	 */
+		if(block && mFilledCnt == 0) 
+		{ 
 			while(!flag) pthread_cond_wait(&mCondHandle, &mMutex);
 		}
 	
-		if(mCurrentSize != 0) 
+		if(mFilledCnt != 0) 
 		{
 			p  = mMsgHolder[mReadHead];
-			mReadHead ++;
+			mReadHead ++ ;
 			if(mReadHead == mSz) mReadHead = 0;
-			mCurrentSize ++;
-		}	
+			mFilledCnt -- ;
+		}
 		flag = false;
 		pthread_mutex_unlock(&mMutex);
 	}
-	void enQueue(cMsg* p)
+	void enQueue(sMsg* p)
 	{
 	
 		pthread_mutex_lock(&mMutex);
 		
-		if(mCurrentSize != mSz) 
+		if(mFilledCnt != mSz) 
 		{		
 			mMsgHolder[mWriteHead] = p;
-			mWriteHead ++;
+			mWriteHead ++ ;
 			if(mWriteHead == mSz) mWriteHead = 0;
-			mCurrentSize --;
+			mFilledCnt ++ ;
 			flag = true;
 		}
 		pthread_mutex_unlock(&mMutex);
@@ -189,28 +191,48 @@ class cThreadModule
 	bool mbStarted;
 	pthread_t mThreadHandle;
 	pthread_attr_t mAttrHandle;
-	cQueue mQueue;
+	cQueue *mpQueue;
+	bool alive;
 	public:
-	cThreadModule(string &&vName, functor vfStart, 
-		functor vfEnd, functor vfProcess) : 
-		mfStart(vfStart), mfEnd(vfEnd), mfProcess(vfProcess) ,mbStarted(false) 
+	void Kill() { alive = false;}
+	bool isAlive() { return alive;}
+	string &GetName() { return mName; }
+	void EnQueue(sMsg *p) 
 	{ 
+		if(mpQueue) 
+		{
+			return mpQueue->enQueue(p);
+		}
+	}
+	sMsg* DeQueue(bool block=true) 
+	{
+		if(mpQueue) return mpQueue->deQueue(block);
+		return 0;
+	}
+	cThreadModule(string &&vName, functor vfStart, 
+		functor vfEnd, functor vfProcess,
+		int vQueueSz=20
+		) : 
+		mfStart(vfStart), mfEnd(vfEnd), mfProcess(vfProcess) ,mbStarted(false) , mpQueue(0), alive(true)
+	{
 		mName = move(vName); 
+		if(vQueueSz) mpQueue = new cQueue(vQueueSz);
 	}
 	~cThreadModule() 
 	{
 		if(mbStarted) 
 		{
-			mfEnd(0);
+			mfEnd(this);
 			pthread_attr_destroy(&mAttrHandle);
 		}
+		if(mpQueue) delete mpQueue;
 	}
-	void Run(void * vArgs = 0 ) 
+	void Run() 
 	{
 		if(mbStarted) return;
-		mfStart(0);
+		mfStart(this);
 		pthread_attr_init(&mAttrHandle);
-		pthread_create(&mThreadHandle, &mAttrHandle, mfProcess, vArgs);
+		pthread_create(&mThreadHandle, &mAttrHandle, mfProcess, this);
 		mbStarted = true;
 	}
 	void Join() 
@@ -220,4 +242,62 @@ class cThreadModule
 };
 
 /************************************************************************/
+/*********************** sample thread-handlers *************************/
+/************************************************************************/
+cPool gPool(2000);
+
+void *start(void * args)
+{
+	cThreadModule *mod = reinterpret_cast<cThreadModule*>(args);
+	cout<<" starting thread ... "<< mod->GetName() <<endl;
+}
+
+void * process(void *args) 
+{
+	cThreadModule *mod = reinterpret_cast<cThreadModule*>(args);
+	cout<<" processing thread ... "<< mod->GetName() <<endl;
+	int iter = 0;
+	while(mod->isAlive())
+	{
+		sMsg *msg = mod->DeQueue(true);
+		if(msg) 
+		{
+			switch(msg->mCode)
+			{
+				case 1: /* kill */
+					mod->Kill();
+				break;
+				default: break;
+			}
+		}
+	}
+}
+
+void * end(void *args) 
+{
+	cThreadModule *mod = reinterpret_cast<cThreadModule*>(args);
+	cout<<" ending thread ... "<< mod->GetName() <<endl;
+}
+
+/************************************************************************/
+/**************************  usage  - main ******************************/
+/************************************************************************/
+int main() 
+{
+	cThreadModule w1(string("worker1"), start, end, process);
+	cThreadModule w2(string("worker2"), start, end, process);
+	cThreadModule p1(string("producer1"), start,end, process);
+	cThreadModule p2(string("producer2"), start, end, process);
+
+	w1.Run();
+	w2.Run();
+	p1.Run();
+	p2.Run();
+
+
+	w1.Join();
+	w2.Join();
+	p1.Join();
+	p2.Join();
+}
 
